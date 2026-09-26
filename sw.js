@@ -1,5 +1,5 @@
 /* Service worker Inlife : hors ligne + rappels finances en arrière-plan */
-const VERSION = 'inlife-v1';
+const VERSION = 'inlife-v2';
 const SHELL_CACHE = `${VERSION}-shell`;
 const FONT_CACHE = 'inlife-fonts';
 const DATA_CACHE = 'inlife-data';

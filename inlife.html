@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0D0F1E" media="(prefers-color-scheme: dark)">
 <title>Inlife</title>
 <meta name="description" content="Programme de développement personnel : journée, thèmes, projets et finances. Fonctionne hors ligne.">
-<link rel="manifest" href="manifest.webmanifest">
+<link rel="manifest" href="manifest.webmanifest" crossorigin="use-credentials">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -133,6 +133,7 @@ svg.ic { width: 20px; height: 20px; flex-shrink: 0; }
 .section-head { display: flex; align-items: center; justify-content: space-between; margin: 30px 0 14px; }
 .section-head h2 { font-size: 19px; font-weight: 700; }
 .section-head .aside { font-size: 13px; color: var(--ink-3); font-weight: 600; }
+.section-head.col { flex-direction: column; align-items: flex-start; gap: 3px; }
 .count-pill {
   font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 99px;
   background: var(--surface); border: 1px solid var(--line); color: var(--ink-2);
@@ -272,7 +273,7 @@ label, .label { font-size: 13px; font-weight: 700; color: var(--ink-2); display:
 
 /* ---------- Timeline ---------- */
 .timeline { list-style: none; margin: 0; padding: 0; }
-.tl-item { --k: var(--primary); display: grid; grid-template-columns: 46px 18px 1fr; gap: 0 8px; position: relative; }
+.tl-item { --k: var(--primary); display: grid; grid-template-columns: 46px 18px minmax(0, 1fr); gap: 0 8px; position: relative; }
 .tl-time { padding-top: 16px; text-align: right; font-variant-numeric: tabular-nums; line-height: 1.2; }
 .tl-time b { display: block; font-size: 14px; font-weight: 750; }
 .tl-time span { font-size: 12px; color: var(--ink-3); font-weight: 600; }
@@ -303,6 +304,40 @@ label, .label { font-size: 13px; font-weight: 700; color: var(--ink-2); display:
 .tl-sub { font-size: 13px; color: var(--ink-2); margin-top: 3px; line-height: 1.4; }
 .tl-foot { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
 .tl-foot .left { font-size: 12px; font-weight: 700; color: var(--k); white-space: nowrap; }
+
+/* Blocs-catégorie : cards de tâches en grille horizontale */
+.tl-card.is-routine, .tl-card.is-routine:active { cursor: default; transform: none; }
+.tl-headbtn { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; }
+.task-strip { display: flex; gap: 8px; overflow-x: auto; margin: 12px -14px 0; padding: 2px 14px 4px; scroll-snap-type: x proximity; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.task-strip::-webkit-scrollbar { display: none; }
+.task-strip.flush { margin: 0 0 18px; padding: 2px 0 4px; }
+.task-card { flex: 0 0 auto; width: 128px; scroll-snap-align: start; display: flex; flex-direction: column; gap: 6px; text-align: left; cursor: pointer; font: inherit; color: inherit; background: var(--surface-2); border: 1.5px solid transparent; border-radius: 14px; padding: 10px 11px; transition: transform .12s ease; }
+.task-card:active { transform: scale(.97); }
+.tk-box { width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--line); display: inline-flex; align-items: center; justify-content: center; color: #fff; }
+.tk-box svg.ic { width: 14px; height: 14px; opacity: 0; }
+.task-card.on { border-color: var(--k); background: color-mix(in srgb, var(--k) 10%, var(--surface)); }
+.task-card.on .tk-box { background: var(--k); border-color: var(--k); }
+.task-card.on .tk-box svg.ic { opacity: 1; }
+.task-card.on .tk-name { text-decoration: line-through; color: var(--ink-3); }
+.tk-name { font-size: 13.5px; font-weight: 700; line-height: 1.25; }
+.tk-meta { font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* Édition : ajout de bloc, blocs-catégorie */
+.add-bar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+.add-chip { --k: var(--primary); display: inline-flex; align-items: center; gap: 6px; padding: 9px 13px; border-radius: 999px; border: 1.5px dashed color-mix(in srgb, var(--k) 55%, var(--line)); background: transparent; color: var(--ink); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.add-chip svg.ic { width: 15px; height: 15px; color: var(--k); }
+.add-chip span { font-weight: 600; color: var(--ink-3); font-size: 12.5px; }
+.rt-tag { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 14px; }
+.rt-tag svg.ic { width: 16px; height: 16px; color: var(--k); }
+.rt-tag span { color: var(--ink-3); font-size: 12.5px; font-weight: 600; margin-left: auto; }
+.end-auto { display: flex; align-items: center; justify-content: center; border-radius: 12px; background: var(--surface-2); font-size: 14px; color: var(--ink-2); margin-bottom: 8px; }
+.end-auto b { margin-left: 5px; color: var(--ink); }
+.rt-head { display: flex; justify-content: space-between; align-items: baseline; }
+.rt-task { display: grid; grid-template-columns: 1fr 104px 40px; gap: 8px; align-items: center; margin-bottom: 8px; }
+.rt-task input { margin: 0; padding: 10px 12px; font-size: 14px; }
+.rt-task .icon-btn { width: 40px; height: 40px; }
+.block-edit.fresh, .rt-task.fresh { animation: fresh 1.4s ease-out; }
+@keyframes fresh { 0% { box-shadow: 0 0 0 3px var(--primary); } 100% { box-shadow: var(--shadow); } }
 
 .progress { height: 6px; background: var(--surface-2); border-radius: 99px; overflow: hidden; flex: 1; }
 .progress > div { height: 100%; background: var(--k, var(--primary)); border-radius: 99px; transition: width .4s ease; }
@@ -348,7 +383,7 @@ label, .label { font-size: 13px; font-weight: 700; color: var(--ink-2); display:
 .bars { display: flex; align-items: flex-end; gap: 8px; height: 170px; padding-top: 6px; }
 .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; min-width: 0; }
 .bar-val { font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums; }
-.bar-track { flex: 1; width: 100%; max-width: 34px; display: flex; align-items: flex-end; background: var(--surface-2); border-radius: 10px; overflow: hidden; }
+.bar-track { flex: 1; width: 100%; display: flex; align-items: flex-end; background: var(--surface-2); border-radius: 10px; overflow: hidden; }
 .bar-track > div { width: 100%; border-radius: 10px; min-height: 6px; }
 .bar-lbl { font-size: 11px; color: var(--ink-3); font-weight: 600; white-space: nowrap; }
 .fill-mint { background: var(--mint); }
@@ -543,7 +578,17 @@ button.row { cursor: pointer; }
 .seg button { border: 1px solid var(--line); background: var(--surface); padding: 8px 14px; border-radius: 99px; font-size: 13px; font-weight: 700; cursor: pointer; color: var(--ink-2); }
 .seg button.on { background: var(--primary); border-color: var(--primary); color: #fff; }
 
-.block-edit { background: var(--surface); border-radius: var(--r-lg); padding: 14px; margin-bottom: 10px; box-shadow: var(--shadow); border-left: 4px solid var(--k); }
+.block-edit { background: var(--surface); border-radius: var(--r-lg); padding: 0; margin-bottom: 10px; box-shadow: var(--shadow); border-left: 4px solid var(--k); }
+.be-head { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; background: none; border: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.be-chev svg.ic { width: 16px; height: 16px; color: var(--ink-3); transition: transform .15s ease; transform: rotate(-90deg); }
+.block-edit.open .be-chev svg.ic { transform: none; }
+.be-icon svg.ic { width: 18px; height: 18px; color: var(--k); }
+.be-title { flex: 1; min-width: 0; font-size: 15px; font-weight: 750; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.be-time { font-size: 13px; font-weight: 650; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.be-body { display: none; padding: 0 14px 14px; }
+.block-edit.open .be-body { display: block; }
+/* bouton d'action fixe en bas de la feuille d'édition */
+.modal-actions.sticky { position: sticky; bottom: calc(-22px - env(safe-area-inset-bottom, 0px)); z-index: 2; margin: 16px -20px calc(-22px - env(safe-area-inset-bottom, 0px)); padding: 12px 20px calc(22px + env(safe-area-inset-bottom, 0px)); background: var(--bg); box-shadow: 0 -10px 14px -10px rgba(13,15,30,.18); }
 .block-edit .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
 .block-edit input, .block-edit select { margin-bottom: 8px; padding: 10px 12px; font-size: 14px; }
 
@@ -851,7 +896,7 @@ function defaultState() {
     ]
   };
 
-  return {
+  const st = {
     settings: {
       pompesMatin: 20, pompesSoir: 50, cordeMinutes: 10,
       themeIndex: 0, themeAuto: true,
@@ -895,6 +940,43 @@ function defaultState() {
     journal: {},
     finance: { currency: '€', remindDays: 3, transactions: [], debts: [], lastNotified: null },
   };
+  attachRoutines(st);
+  return st;
+}
+
+// ===================== BLOCS-CATEGORIE (routines) =====================
+// Un bloc-catégorie regroupe des tâches (nom + durée). Dans un jour-type, un bloc y fait référence
+// via routineId : sa fin = début + somme des durées, recalculée à chaque modification.
+function defaultRoutines(s) {
+  const t = (name, minutes, key) => ({ id: uid(), name, minutes, ...(key ? { key } : {}) });
+  return [
+    { id: 'rt_matin', name: 'Rituel du matin', kind: 'ritual', tasks: [
+      t('Eau et lumière', 1), t('Étirement', 2), t(`${s.pompesMatin} pompes`, 2, 'pompesMatin'),
+      t('Corde à sauter', Math.max(1, s.cordeMinutes), 'corde'), t('Douche', 3), t('Carnet', 2),
+    ] },
+    { id: 'rt_soir', name: 'Rituel du soir', kind: 'ritual', tasks: [
+      t(`${s.pompesSoir} pompes`, 5, 'pompesSoir'), t('Carnet du lendemain', 5), t('Écrans coupés', 5),
+    ] },
+  ];
+}
+function routineTotal(r) { return r.tasks.reduce((sum, t) => sum + (t.minutes || 0), 0); }
+function routineEnd(start, r) { return minToTime(Math.min(timeToMin(start) + Math.max(1, routineTotal(r)), 23 * 60 + 59)); }
+function applyRoutineToBlock(b, r) {
+  b.title = r.name; b.kind = r.kind || 'ritual'; b.sub = ''; b.end = routineEnd(b.start, r);
+}
+// Première installation / anciennes données : crée les rituels et relie les blocs « Rituel du matin/soir »
+function attachRoutines(st) {
+  if (st.routines) return false;
+  st.routines = defaultRoutines({ pompesMatin: 20, pompesSoir: 50, cordeMinutes: 10, ...st.settings });
+  const link = b => {
+    if (b.kind !== 'ritual') return;
+    const id = /matin/i.test(b.title) ? 'rt_matin' : /soir/i.test(b.title) ? 'rt_soir' : null;
+    const r = id && st.routines.find(x => x.id === id);
+    if (r) { b.routineId = id; applyRoutineToBlock(b, r); }
+  };
+  st.dayTypes.forEach(dt => dt.blocks.forEach(link));
+  Object.values(st.dayOverrides || {}).forEach(o => o.blocks.forEach(link));
+  return true;
 }
 
 // ===================== THEMES : contenu par défaut =====================
@@ -958,6 +1040,7 @@ const migrateBlock = b => {
 };
 state.dayTypes.forEach(dt => dt.blocks.forEach(migrateBlock));
 Object.values(state.dayOverrides).forEach(o => o.blocks.forEach(migrateBlock));
+if (attachRoutines(state)) migrated = true;
 if (migrated) saveState();
 
 // ===================== LOGIQUE PROGRAMME =====================
@@ -987,22 +1070,82 @@ function ensureOverride(dk) {
 
 function findProject(id) { return state.projects.find(p => p.id === id); }
 function blockProjects(b) { return (b.projectIds || []).map(findProject).filter(Boolean); }
+function findRoutine(id) { return (state.routines || []).find(r => r.id === id); }
+function blockRoutine(b) { return b.routineId ? findRoutine(b.routineId) || null : null; }
+// tâches d'un bloc-catégorie avec leur heure de début calculée en séquence
+function routineTasksTimed(b, r) {
+  let t = timeToMin(b.start);
+  return r.tasks.map(k => { const start = minToTime(t); t += k.minutes; return { ...k, start }; });
+}
+function eachBlockList(fn) {
+  state.dayTypes.forEach(dt => fn(dt.blocks));
+  Object.values(state.dayOverrides).forEach(o => fn(o.blocks));
+}
+// répercute une modification du bloc-catégorie sur tous les blocs qui l'utilisent
+function syncRoutine(routineId) {
+  const r = findRoutine(routineId);
+  if (!r) return;
+  eachBlockList(list => list.forEach(b => { if (b.routineId === routineId) applyRoutineToBlock(b, r); }));
+}
+function toggleRoutineTask(dk, blockId, taskId, inModal) {
+  const block = getDayTypeForDate(dk).blocks.find(b => b.id === blockId);
+  const rt = block && blockRoutine(block);
+  if (!rt) return;
+  const ids = rt.tasks.map(t => t.id);
+  const cur = new Set(((getLog(dk, blockId) || {}).tasks || []).filter(id => ids.includes(id)));
+  if (cur.has(taskId)) cur.delete(taskId); else cur.add(taskId);
+  if (!cur.size) clearLog(dk, blockId);
+  else setLog(dk, blockId, cur.size === ids.length ? 'done' : 'partial', '', [...cur]);
+  render();
+  if (inModal) openBlockModal(dk, blockId, true);
+}
+function renderTaskStrip(dk, b, rt, where, flush) {
+  const done = new Set(((getLog(dk, b.id) || {}).tasks) || []);
+  return `<div class="task-strip${flush ? ' flush' : ''}" data-strip="${where}:${b.id}" style="--k:${kindOf(b).color}">${routineTasksTimed(b, rt).map(t => `
+    <button type="button" class="task-card ${done.has(t.id) ? 'on' : ''}" role="checkbox" aria-checked="${done.has(t.id)}" onclick="toggleRoutineTask('${dk}','${b.id}','${t.id}',${where === 'modal'})">
+      <span class="tk-box">${ic('check')}</span>
+      <span class="tk-name">${escapeHtml(t.name)}</span>
+      <span class="tk-meta">${t.start} · ${fmtDuration(t.minutes)}</span>
+    </button>`).join('')}</div>`;
+}
+// conserve la position de défilement des rangées de cards lors d'un re-rendu
+function captureStrips() {
+  const m = {};
+  document.querySelectorAll('.task-strip').forEach(el => { m[el.dataset.strip] = el.scrollLeft; });
+  return () => document.querySelectorAll('.task-strip').forEach(el => { if (m[el.dataset.strip]) el.scrollLeft = m[el.dataset.strip]; });
+}
 
 function getLog(dk, blockId) {
   return (state.logs[dk] && state.logs[dk][blockId]) || null;
 }
-function setLog(dk, blockId, status, note) {
+// annule le temps déjà crédité pour un bloc (évite de compter deux fois)
+function revertCredit(prev) {
+  if (!prev || !prev.credit) return;
+  Object.entries(prev.credit).forEach(([pid, m]) => {
+    const p = findProject(pid);
+    if (p) p.totalMinutes = Math.max(0, (p.totalMinutes || 0) - m);
+  });
+}
+function clearLog(dk, blockId) {
+  const prev = state.logs[dk] && state.logs[dk][blockId];
+  if (!prev) return;
+  revertCredit(prev);
+  delete state.logs[dk][blockId];
+  if (!Object.keys(state.logs[dk]).length) delete state.logs[dk];
+  saveState();
+}
+// tasks : ids des tâches cochées (blocs-catégorie). Sinon déduit du statut choisi.
+function setLog(dk, blockId, status, note, tasks) {
   if (!state.logs[dk]) state.logs[dk] = {};
-  // annule le temps déjà crédité pour ce bloc (évite de compter deux fois)
   const prev = state.logs[dk][blockId];
-  if (prev && prev.credit) {
-    Object.entries(prev.credit).forEach(([pid, m]) => {
-      const p = findProject(pid);
-      if (p) p.totalMinutes = Math.max(0, (p.totalMinutes || 0) - m);
-    });
-  }
+  revertCredit(prev);
   const block = getDayTypeForDate(dk).blocks.find(b => b.id === blockId);
   const log = { status, note: note || '', ts: Date.now(), title: block ? block.title : '' };
+  const rt = block && blockRoutine(block);
+  if (rt) {
+    const ids = rt.tasks.map(t => t.id);
+    log.tasks = tasks || (status === 'done' ? ids : status === 'missed' ? [] : ((prev && prev.tasks) || []).filter(id => ids.includes(id)));
+  }
   const projs = block ? blockProjects(block) : [];
   if (projs.length && (status === 'done' || status === 'partial')) {
     const dur = Math.max(0, timeToMin(block.end) - timeToMin(block.start)) * (status === 'partial' ? 0.5 : 1);
@@ -1328,7 +1471,9 @@ function renderToday() {
     <div class="card">${renderJournalForm(dk)}</div>
   `;
 
+  const restoreStrips = captureStrips();
   document.getElementById('app').innerHTML = html;
+  restoreStrips();
 }
 
 function renderTodayFinanceBanner() {
@@ -1484,22 +1629,36 @@ function renderTimeline(dt, dk, nowMin) {
       const p = Math.round(((nowMin - startMin) / Math.max(1, endMin - startMin)) * 100);
       foot = `<div class="tl-foot"><div class="progress"><div style="width:${p}%"></div></div><span class="left">${fmtDuration(endMin - nowMin)}</span></div>`;
     }
-    return `
-      <li class="tl-item ${cls}" style="--k:${k.color}">
-        <div class="tl-time"><b>${b.start}</b><span>${b.end}</span></div>
-        <div class="tl-rail"><span class="tl-dot"></span></div>
-        <button class="tl-card" onclick="openBlockModal('${dk}','${b.id}')">
+    const rt = blockRoutine(b);
+    let sub = b.sub;
+    if (rt) {
+      const ticked = new Set(((log || {}).tasks) || []);
+      const n = rt.tasks.filter(t => ticked.has(t.id)).length;
+      sub = rt.tasks.length ? `${n}/${rt.tasks.length} tâches · ${fmtDuration(endMin - startMin)}` : 'Aucune tâche';
+    }
+    const head = `
           <div class="tl-head">
             <span class="icon-tile sm" style="--k:${k.color}">${ic(k.icon)}</span>
             <div class="tl-titles">
               <div class="tl-title">${escapeHtml(b.title)}</div>
-              ${b.sub ? `<div class="tl-sub">${escapeHtml(b.sub)}</div>` : ''}
+              ${sub ? `<div class="tl-sub">${escapeHtml(sub)}</div>` : ''}
               ${blockProjects(b).length ? `<div class="block-projs">${blockProjects(b).map(p => `<span>${ic('folder')}${escapeHtml(p.name)}</span>`).join('')}</div>` : ''}
             </div>
             ${badge}
           </div>
-          ${foot}
-        </button>
+          ${foot}`;
+    // bloc-catégorie : l'en-tête ouvre la fiche, les cards de tâches se cochent directement
+    const card = rt
+      ? `<div class="tl-card is-routine">
+          <button class="tl-headbtn" onclick="openBlockModal('${dk}','${b.id}')">${head}</button>
+          ${rt.tasks.length ? renderTaskStrip(dk, b, rt, 'tl') : ''}
+        </div>`
+      : `<button class="tl-card" onclick="openBlockModal('${dk}','${b.id}')">${head}</button>`;
+    return `
+      <li class="tl-item ${cls}" style="--k:${k.color}">
+        <div class="tl-time"><b>${b.start}</b><span>${b.end}</span></div>
+        <div class="tl-rail"><span class="tl-dot"></span></div>
+        ${card}
       </li>`;
   }).join('');
   return `<ol class="timeline">${items}</ol>`;
@@ -1611,12 +1770,14 @@ function submitConfirm() {
 }
 
 // ===================== MODAL: BLOC =====================
-function openBlockModal(dk, blockId) {
+function openBlockModal(dk, blockId, instant) {
+  const restoreStrips = instant ? captureStrips() : null;
   const dt = getDayTypeForDate(dk);
   const block = dt.blocks.find(b => b.id === blockId);
   const log = getLog(dk, blockId);
   const k = kindOf(block);
   const projs = blockProjects(block);
+  const rt = blockRoutine(block);
   const choice = (st) => `
     <button class="status-choice ${st} ${log?.status===st?'on':''}" onclick="setLog('${dk}','${blockId}','${st}');closeModal();render();">
       <span class="circ">${ic(STATUS[st].icon)}</span>${STATUS[st].label}
@@ -1632,13 +1793,15 @@ function openBlockModal(dk, blockId) {
     ${block.sub ? `<p style="font-size:15px;color:var(--ink-2);margin-bottom:18px;">${escapeHtml(block.sub)}</p>` : ''}
     ${projs.length ? `<p class="chips" style="margin-bottom:18px;">${projs.map(p => `<span class="badge primary">${ic('folder')}${escapeHtml(p.name)}</span>`).join('')}</p>
       <p class="muted-note" style="margin:-10px 0 14px">Fait : ${fmtDuration(timeToMin(block.end) - timeToMin(block.start))} ajoutées au temps ${projs.length > 1 ? 'des projets, réparties' : 'du projet'}. Partiel : la moitié.</p>` : ''}
+    ${rt && rt.tasks.length ? `<div class="label" style="margin-top:0">Tâches</div>${renderTaskStrip(dk, block, rt, 'modal', true)}` : ''}
     <div class="label" style="margin-top:0">Comment ça s'est passé ?</div>
     <div class="status-choices">${choice('done')}${choice('partial')}${choice('missed')}</div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Fermer</button>
       <button class="btn btn-soft" onclick="openDayEditor('${dk}')">${ic('edit')}Modifier le jour</button>
     </div>
-  `);
+  `, instant ? { instant: true } : undefined);
+  if (restoreStrips) restoreStrips();
 }
 
 // ===================== ECRAN: CARNET =====================
@@ -1858,20 +2021,22 @@ function createDayType() {
   });
 }
 
-function openDayTypeEditor(dtId) {
+function openDayTypeEditor(dtId, instant) {
+  if (!instant) openBlocks.clear();
   const dt = state.dayTypes.find(d => d.id === dtId);
   const canDelete = !['dt_semaine','dt_weekend','dt_ferie'].includes(dt.id);
   openSheet(`
     <div class="label" style="margin-top:0">Nom du jour-type</div>
     <input value="${escapeAttr(dt.name)}" style="font-size:18px;font-weight:700;margin-bottom:18px;" onchange="renameDayType('${dt.id}',this.value)">
+    <div class="label">Ajouter un bloc</div>
+    ${renderAddBlockBar('dt:' + dt.id)}
     <div class="label">Blocs</div>
     <div id="dt-blocks-list">
       ${dt.blocks.map(b => renderBlockEditRow('dt:' + dt.id, b)).join('') || '<p class="muted-note">Aucun bloc pour l\'instant.</p>'}
     </div>
-    <button class="btn btn-dashed btn-block" style="margin-top:6px;" onclick="addBlock('dt:${dt.id}')">${ic('plus')}Ajouter un bloc</button>
     ${canDelete ? `<button class="btn btn-block btn-danger-outline" style="margin-top:10px;" onclick="deleteDayType('${dt.id}')">${ic('trash')}Supprimer ce jour-type</button>` : ''}
-    <div class="modal-actions"><button class="btn btn-primary btn-block" onclick="closeModal();render();">Terminé</button></div>
-  `);
+    <div class="modal-actions sticky"><button class="btn btn-primary btn-block" onclick="closeModal();render();">Terminé</button></div>
+  `, instant ? { instant: true } : undefined);
 }
 function renameDayType(dtId, name) {
   const dt = state.dayTypes.find(d => d.id === dtId);
@@ -1900,14 +2065,70 @@ function blockContainer(target, forWrite) {
   if (kind === 'day') return forWrite ? ensureOverride(key) : getDayTypeForDate(key);
   return state.dayTypes.find(d => d.id === key);
 }
-function reopenEditor(target) {
-  if (target.startsWith('day:')) openDayEditor(target.slice(4));
-  else openDayTypeEditor(target.slice(3));
+// focusId : bloc à mettre en évidence (défilement + surbrillance) après réouverture
+function reopenEditor(target, focusId) {
+  if (target.startsWith('day:')) openDayEditor(target.slice(4), true);
+  else openDayTypeEditor(target.slice(3), true);
+  const el = focusId && document.getElementById('blk-' + focusId);
+  if (el) { el.scrollIntoView({ block: 'center', behavior: 'smooth' }); el.classList.add('fresh'); }
+}
+function renderAddBlockBar(target) {
+  return `<div class="add-bar">
+    <button type="button" class="add-chip" onclick="addBlock('${target}')">${ic('plus')}Bloc libre</button>
+    ${(state.routines || []).map(r => `<button type="button" class="add-chip" style="--k:${(KINDS[r.kind] || KINDS.ritual).color}" onclick="addBlock('${target}','${r.id}')">${ic('plus')}${escapeHtml(r.name)}<span>${fmtDuration(routineTotal(r))}</span></button>`).join('')}
+  </div>`;
+}
+function blockProjectChips(target, b) {
+  const ids = b.projectIds || [];
+  if (!state.projects.length) return '';
+  return `
+      <div class="label" style="margin:4px 0 8px">${ic('folder')}Projets suivis sur ce bloc</div>
+      <div class="proj-chips">
+        ${state.projects.map(p => {
+          const cat = state.categories.find(c => c.id === p.categoryId);
+          return `<button type="button" class="proj-chip ${ids.includes(p.id) ? 'on' : ''}" style="--k:${catColor(cat)}" aria-pressed="${ids.includes(p.id)}" onclick="toggleBlockProject('${target}','${b.id}','${p.id}',this)">${escapeHtml(p.name)}</button>`;
+        }).join('')}
+      </div>`;
+}
+// Blocs repliables : seuls ceux listés dans openBlocks sont dépliés
+const openBlocks = new Set();
+function toggleBlockOpen(id, hdr) {
+  const el = document.getElementById('blk-' + id);
+  if (!el) return;
+  const on = !el.classList.contains('open');
+  el.classList.toggle('open', on);
+  hdr.setAttribute('aria-expanded', on);
+  if (on) openBlocks.add(id); else openBlocks.delete(id);
+}
+function blockEditShell(b, inner) {
+  const open = openBlocks.has(b.id);
+  const k = kindOf(b);
+  return `
+    <div class="block-edit ${open ? 'open' : ''}" id="blk-${b.id}" style="--k:${k.color}">
+      <button type="button" class="be-head" aria-expanded="${open}" onclick="toggleBlockOpen('${b.id}',this)">
+        <span class="be-chev">${ic('chevD')}</span>
+        <span class="be-icon">${ic(k.icon)}</span>
+        <span class="be-title" id="bt-${b.id}">${escapeHtml(b.title)}</span>
+        <span class="be-time" id="bti-${b.id}">${b.start} – ${b.end}</span>
+      </button>
+      <div class="be-body">${inner}</div>
+    </div>`;
 }
 function renderBlockEditRow(target, b) {
-  const ids = b.projectIds || [];
-  return `
-    <div class="block-edit" style="--k:${kindOf(b).color}">
+  const rt = blockRoutine(b);
+  const remove = `<button class="btn btn-sm btn-danger-outline btn-block" style="margin-top:12px" onclick="removeBlock('${target}','${b.id}')">${ic('trash')}Supprimer ce bloc</button>`;
+  if (rt) {
+    // bloc-catégorie : seul le début est saisi, la fin découle des durées des tâches
+    return blockEditShell(b, `
+      <p class="muted-note" style="padding:0 0 8px">${rt.tasks.length} tâche${rt.tasks.length > 1 ? 's' : ''} · ${fmtDuration(routineTotal(rt))}</p>
+      <div class="grid2">
+        <input type="time" value="${b.start}" style="margin:0" aria-label="Début" onchange="updateBlockField('${target}','${b.id}','start',this.value)">
+        <div class="end-auto">Fin<b id="end-${b.id}">${b.end}</b></div>
+      </div>
+      ${blockProjectChips(target, b)}
+      ${remove}`);
+  }
+  return blockEditShell(b, `
       <div class="grid2">
         <input type="time" value="${b.start}" style="margin:0" aria-label="Début" onchange="updateBlockField('${target}','${b.id}','start',this.value)">
         <input type="time" value="${b.end}" style="margin:0" aria-label="Fin" onchange="updateBlockField('${target}','${b.id}','end',this.value)">
@@ -1917,23 +2138,23 @@ function renderBlockEditRow(target, b) {
       <select aria-label="Type" onchange="updateBlockField('${target}','${b.id}','kind',this.value);this.closest('.block-edit').style.setProperty('--k', KINDS[this.value].color)">
         ${Object.entries(KINDS).map(([key, k]) => `<option value="${key}" ${(b.kind || 'other') === key ? 'selected' : ''}>${k.label}</option>`).join('')}
       </select>
-      ${state.projects.length ? `
-      <div class="label" style="margin:4px 0 8px">${ic('folder')}Projets suivis sur ce bloc</div>
-      <div class="proj-chips">
-        ${state.projects.map(p => {
-          const cat = state.categories.find(c => c.id === p.categoryId);
-          return `<button type="button" class="proj-chip ${ids.includes(p.id) ? 'on' : ''}" style="--k:${catColor(cat)}" aria-pressed="${ids.includes(p.id)}" onclick="toggleBlockProject('${target}','${b.id}','${p.id}',this)">${escapeHtml(p.name)}</button>`;
-        }).join('')}
-      </div>` : ''}
-      <button class="btn btn-sm btn-danger-outline btn-block" style="margin-top:12px" onclick="removeBlock('${target}','${b.id}')">${ic('trash')}Supprimer ce bloc</button>
-    </div>
-  `;
+      ${blockProjectChips(target, b)}
+      ${remove}`);
 }
 function updateBlockField(target, blockId, field, val) {
   const c = blockContainer(target, true);
   const b = c.blocks.find(x => x.id === blockId);
   if (!b) return;
   b[field] = val;
+  const rt = blockRoutine(b);
+  if (rt && field === 'start') {
+    b.end = routineEnd(b.start, rt);
+    const endEl = document.getElementById('end-' + b.id);
+    if (endEl) endEl.textContent = b.end;
+  }
+  const hTitle = document.getElementById('bt-' + b.id), hTime = document.getElementById('bti-' + b.id);
+  if (hTitle) hTitle.textContent = b.title;
+  if (hTime) hTime.textContent = `${b.start} – ${b.end}`;
   c.blocks.sort((a, d) => timeToMin(a.start) - timeToMin(d.start));
   saveState();
 }
@@ -1947,12 +2168,19 @@ function toggleBlockProject(target, blockId, projId, el) {
   saveState();
   if (el) { el.classList.toggle('on', on); el.setAttribute('aria-pressed', on); }
 }
-function addBlock(target) {
+// Ajoute à la fin de la liste, à la suite du dernier bloc (routineId : bloc-catégorie)
+function addBlock(target, routineId) {
   const c = blockContainer(target, true);
-  c.blocks.push({ id: uid(), start: '08:00', end: '09:00', title: 'Nouveau bloc', sub: '', kind: 'other', projectIds: [] });
-  c.blocks.sort((a, d) => timeToMin(a.start) - timeToMin(d.start));
+  const lastEnd = c.blocks.reduce((m, b) => Math.max(m, timeToMin(b.end)), -1);
+  const startMin = lastEnd < 0 ? 8 * 60 : Math.min(lastEnd, 23 * 60);
+  const nb = { id: uid(), start: minToTime(startMin), end: minToTime(Math.min(startMin + 60, 23 * 60 + 59)), title: 'Nouveau bloc', sub: '', kind: 'other', projectIds: [] };
+  const r = routineId && findRoutine(routineId);
+  if (r) { nb.routineId = r.id; applyRoutineToBlock(nb, r); }
+  c.blocks.push(nb);
   saveState();
-  reopenEditor(target);
+  openBlocks.clear();
+  openBlocks.add(nb.id);
+  reopenEditor(target, nb.id);
 }
 function removeBlock(target, blockId) {
   const c = blockContainer(target, true);
@@ -1962,7 +2190,8 @@ function removeBlock(target, blockId) {
 }
 
 // Déroulé d'un jour précis (ne modifie pas le jour-type)
-function openDayEditor(dk) {
+function openDayEditor(dk, instant) {
+  if (!instant) openBlocks.clear();
   const dt = getDayTypeForDate(dk);
   const target = 'day:' + dk;
   openSheet(`
@@ -1975,11 +2204,12 @@ function openDayEditor(dk) {
       ${dt.custom ? '<span class="badge primary">Personnalisé</span>' : ''}
     </div>
     <div class="ob-summary" style="margin:0 0 18px">${ic('edit')}<span>Les changements ne concernent que ce jour. Le jour-type reste inchangé.</span></div>
+    <div class="label">Ajouter un bloc</div>
+    ${renderAddBlockBar(target)}
     ${dt.blocks.map(b => renderBlockEditRow(target, b)).join('') || '<p class="muted-note">Aucun bloc ce jour-là.</p>'}
-    <button class="btn btn-dashed btn-block" style="margin-top:6px" onclick="addBlock('${target}')">${ic('plus')}Ajouter un bloc</button>
     ${dt.custom ? `<button class="btn btn-block btn-danger-outline" style="margin-top:10px" onclick="resetDayOverride('${dk}')">Revenir au jour-type « ${escapeHtml(dt.name)} »</button>` : ''}
-    <div class="modal-actions"><button class="btn btn-primary btn-block" onclick="closeDayEditor('${dk}')">Terminé</button></div>
-  `);
+    <div class="modal-actions sticky"><button class="btn btn-primary btn-block" onclick="closeDayEditor('${dk}')">Terminé</button></div>
+  `, instant ? { instant: true } : undefined);
 }
 function closeDayEditor(dk) {
   closeModal();
@@ -2327,16 +2557,15 @@ function deleteDoneTasks(projId, phaseId) {
 function renderStats() {
   const days = Object.keys(state.logs).sort();
   const weekScores = {};
+  // semaines du programme : S1 = 7 premiers jours à partir de la date de début définie
   days.forEach(dk => {
-    const d = new Date(dk+'T00:00:00');
-    const monday = new Date(d); monday.setDate(d.getDate() - ((d.getDay()+6)%7));
-    const wk = dateKey(monday);
+    const wk = Math.max(0, Math.floor(daysBetween(state.program.startDate, dk) / 7)) + 1;
     const sc = trackedScore(dk);
     if (sc === null) return;
     if (!weekScores[wk]) weekScores[wk] = [];
     weekScores[wk].push(sc);
   });
-  const weekKeys = Object.keys(weekScores).sort().slice(-8);
+  const weekKeys = Object.keys(weekScores).map(Number).sort((a, b) => a - b).slice(-8);
 
   const allScores = days.map(dk => trackedScore(dk)).filter(s => s !== null);
   const globalAvg = allScores.length ? Math.round(allScores.reduce((a,b)=>a+b,0)/allScores.length) : 0;
@@ -2348,7 +2577,7 @@ function renderStats() {
       ${statTile('calendar', 'var(--k-ritual)', allScores.length, 'Jours suivis')}
       ${statTile('trophy', 'var(--mint)', allScores.filter(s=>s>=80).length, 'Jours ≥ 80 %')}
     </div>
-    <div class="section-head"><h2>Par semaine</h2><span class="aside">${weekKeys.length ? 'Moyenne des jours suivis' : ''}</span></div>
+    <div class="section-head col"><h2>Par semaine</h2><span class="aside">${weekKeys.length ? 'Semaines du programme · moyenne des jours suivis' : ''}</span></div>
   `;
   if (!weekKeys.length) {
     html += `<div class="empty-state"><span class="icon-tile">${ic('chart')}</span><b>Pas encore de données</b>Valide tes blocs quelques jours, le graphique apparaîtra ici.</div>`;
@@ -2359,7 +2588,7 @@ function renderStats() {
       return `<div class="bar-col">
         <span class="bar-val">${avg}</span>
         <div class="bar-track"><div class="fill-${scoreTone(avg)}" style="height:${Math.max(4, avg)}%"></div></div>
-        <span class="bar-lbl">${fmtDate(wk, { day: 'numeric', month: 'numeric' })}</span>
+        <span class="bar-lbl" title="${fmtDate(addDays(state.program.startDate, (wk - 1) * 7), { day: 'numeric', month: 'short' })} – ${fmtDate(addDays(state.program.startDate, wk * 7 - 1), { day: 'numeric', month: 'short' })}">S${wk}</span>
       </div>`;
     }).join('')}</div></div>`;
   }
@@ -2392,12 +2621,6 @@ function renderStats() {
 // ===================== ECRAN: REGLAGES =====================
 function renderSettings() {
   const s = state.settings;
-  const stepper = (key, step) => `
-    <div class="stepper">
-      <button onclick="stepSetting('${key}',-${step})" aria-label="Diminuer">${ic('minus')}</button>
-      <span>${s[key]}</span>
-      <button onclick="stepSetting('${key}',${step})" aria-label="Augmenter">${ic('plus')}</button>
-    </div>`;
   const html = `
     <div class="screen-head" style="align-items:center;margin-bottom:8px">
       <button class="back-btn" onclick="navigate('today')">${ic('chevL')}Aujourd'hui</button>
@@ -2430,24 +2653,7 @@ function renderSettings() {
       </button>
     </div>
 
-    <div class="section-head"><h2>Rituels</h2></div>
-    <div class="group">
-      <div class="row">
-        <span class="icon-tile sm" style="--k:var(--k-ritual)">${ic('sunrise')}</span>
-        <div class="row-main"><div class="row-title">Pompes du matin</div></div>
-        ${stepper('pompesMatin', 5)}
-      </div>
-      <div class="row">
-        <span class="icon-tile sm" style="--k:var(--k-work)">${ic('dumbbell')}</span>
-        <div class="row-main"><div class="row-title">Pompes du soir</div></div>
-        ${stepper('pompesSoir', 5)}
-      </div>
-      <div class="row">
-        <span class="icon-tile sm" style="--k:var(--k-sport)">${ic('activity')}</span>
-        <div class="row-main"><div class="row-title">Corde à sauter</div><div class="row-sub">Minutes, le matin</div></div>
-        ${stepper('cordeMinutes', 1)}
-      </div>
-    </div>
+    ${renderRoutinesSection()}
 
     <div class="section-head"><h2>Programme</h2></div>
     <div class="group">
@@ -2521,6 +2727,128 @@ function renderSettings() {
     <button class="btn btn-block btn-danger-outline" onclick="resetData()">${ic('trash')}Réinitialiser toutes les données</button>
   `;
   document.getElementById('app').innerHTML = html;
+}
+// ----- Blocs-catégorie : liste + éditeur -----
+function renderRoutinesSection() {
+  const rows = (state.routines || []).map(r => {
+    const k = KINDS[r.kind] || KINDS.ritual;
+    return `
+      <button class="row" onclick="openRoutineEditor('${r.id}')">
+        <span class="icon-tile sm" style="--k:${k.color}">${ic(k.icon)}</span>
+        <div class="row-main">
+          <div class="row-title">${escapeHtml(r.name)}</div>
+          <div class="row-sub">${r.tasks.length} tâche${r.tasks.length > 1 ? 's' : ''} · ${fmtDuration(routineTotal(r))}</div>
+        </div>
+        <span class="chev">${ic('chevR')}</span>
+      </button>`;
+  }).join('');
+  return `
+    <div class="section-head"><h2>Blocs-catégorie</h2></div>
+    <p class="muted-note" style="margin:-4px 2px 12px">Des groupes de tâches (rituel du matin…) à ajouter en un seul bloc dans tes jours-type. Tu ne renseignes que la durée de chaque tâche.</p>
+    ${rows ? `<div class="group">${rows}</div>` : ''}
+    <button class="btn btn-dashed btn-block" style="margin-top:10px" onclick="createRoutine()">${ic('plus')}Créer un bloc-catégorie</button>`;
+}
+function createRoutine() {
+  askText({
+    title: 'Nouveau bloc-catégorie', placeholder: 'Ex : Rituel matinal',
+    onSubmit: (name) => {
+      const r = { id: uid(), name, kind: 'ritual', tasks: [] };
+      state.routines.push(r);
+      saveState();
+      render();
+      openRoutineEditor(r.id);
+    }
+  });
+}
+function renderRoutineTaskRow(rid, t) {
+  return `
+    <div class="rt-task" id="rtt-${t.id}">
+      <input value="${escapeAttr(t.name)}" placeholder="Nom de la tâche" aria-label="Nom de la tâche" onchange="updateRoutineTask('${rid}','${t.id}','name',this.value,this)">
+      <input type="time" id="rtd-${t.id}" value="${minToTime(t.minutes)}" aria-label="Durée (h:min)" onchange="updateRoutineTask('${rid}','${t.id}','minutes',this.value,this)">
+      <button class="icon-btn" aria-label="Supprimer la tâche" onclick="removeRoutineTask('${rid}','${t.id}')">${ic('trash')}</button>
+    </div>`;
+}
+function openRoutineEditor(id, instant) {
+  const r = findRoutine(id);
+  if (!r) return;
+  openSheet(`
+    <div class="label" style="margin-top:0">Nom du bloc</div>
+    <input value="${escapeAttr(r.name)}" style="font-size:18px;font-weight:700;margin-bottom:14px" onchange="renameRoutine('${r.id}',this.value)">
+    <div class="label">Type</div>
+    <select style="margin-bottom:18px" aria-label="Type" onchange="setRoutineKind('${r.id}',this.value)">
+      ${Object.entries(KINDS).map(([key, k]) => `<option value="${key}" ${(r.kind || 'ritual') === key ? 'selected' : ''}>${k.label}</option>`).join('')}
+    </select>
+    <div class="label rt-head"><span>Tâches</span><span id="rt-total">Total : ${fmtDuration(routineTotal(r))}</span></div>
+    <button class="btn btn-dashed btn-block" style="margin-bottom:12px" onclick="addRoutineTask('${r.id}')">${ic('plus')}Ajouter une tâche</button>
+    <div id="rt-tasks">${r.tasks.map(t => renderRoutineTaskRow(r.id, t)).join('') || '<p class="muted-note">Aucune tâche pour l\'instant.</p>'}</div>
+    ${r.tasks.length ? '<p class="muted-note" style="margin-top:0">Durée de chaque tâche en heures : minutes.</p>' : ''}
+    <button class="btn btn-block btn-danger-outline" style="margin-top:10px" onclick="deleteRoutine('${r.id}')">${ic('trash')}Supprimer ce bloc-catégorie</button>
+    <div class="modal-actions sticky"><button class="btn btn-primary btn-block" onclick="closeModal();render();">Terminé</button></div>
+  `, instant ? { instant: true } : undefined);
+}
+function renameRoutine(id, name) {
+  const r = findRoutine(id);
+  if (!r) return;
+  r.name = name.trim() || r.name;
+  syncRoutine(id);
+  saveState();
+}
+function setRoutineKind(id, kind) {
+  const r = findRoutine(id);
+  if (!r) return;
+  r.kind = kind;
+  syncRoutine(id);
+  saveState();
+}
+function updateRoutineTask(rid, tid, field, val, el) {
+  const r = findRoutine(rid);
+  const t = r && r.tasks.find(x => x.id === tid);
+  if (!t) return;
+  if (field === 'name') t.name = val.trim() || t.name;
+  else {
+    t.minutes = Math.max(1, val ? timeToMin(val) : t.minutes);
+    if (el) el.value = minToTime(t.minutes);
+  }
+  syncRoutine(rid);
+  saveState();
+  const total = document.getElementById('rt-total');
+  if (total) total.textContent = 'Total : ' + fmtDuration(routineTotal(r));
+}
+function addRoutineTask(rid) {
+  const r = findRoutine(rid);
+  if (!r) return;
+  const t = { id: uid(), name: 'Nouvelle tâche', minutes: 5 };
+  r.tasks.push(t);
+  syncRoutine(rid);
+  saveState();
+  openRoutineEditor(rid, true);
+  const row = document.getElementById('rtt-' + t.id);
+  if (row) {
+    row.scrollIntoView({ block: 'center' });
+    row.classList.add('fresh');
+    const inp = row.querySelector('input');
+    if (inp) { inp.focus({ preventScroll: true }); inp.select(); }
+  }
+}
+function removeRoutineTask(rid, tid) {
+  const r = findRoutine(rid);
+  if (!r) return;
+  r.tasks = r.tasks.filter(t => t.id !== tid);
+  syncRoutine(rid);
+  saveState();
+  openRoutineEditor(rid, true);
+}
+function deleteRoutine(id) {
+  askConfirm({
+    title: 'Supprimer ce bloc-catégorie ?',
+    message: 'Les blocs qui l’utilisent deviennent des blocs libres, avec les mêmes horaires.',
+    onConfirm: () => {
+      state.routines = state.routines.filter(r => r.id !== id);
+      eachBlockList(list => list.forEach(b => { if (b.routineId === id) delete b.routineId; }));
+      saveState();
+      render();
+    }
+  });
 }
 function stepSetting(key, delta) {
   let v = (state.settings[key] || 0) + delta;
@@ -3037,6 +3365,16 @@ function obGo(step) {
 function finishOnboarding() {
   state.program.name = (ob.name || '').trim() || `Programme ${ob.duration} jours`;
   setProgramDates(ob.startDate, ob.duration);
+  // les valeurs de l'assistant modifient les tâches liées des blocs-catégorie
+  const prev = state.settings;
+  (state.routines || []).forEach(r => {
+    r.tasks.forEach(t => {
+      if (t.key === 'pompesMatin' && ob.pompesMatin !== prev.pompesMatin) t.name = `${ob.pompesMatin} pompes`;
+      if (t.key === 'pompesSoir' && ob.pompesSoir !== prev.pompesSoir) t.name = `${ob.pompesSoir} pompes`;
+      if (t.key === 'corde' && ob.cordeMinutes !== prev.cordeMinutes) t.minutes = Math.max(1, ob.cordeMinutes);
+    });
+    syncRoutine(r.id);
+  });
   state.settings.themeAuto = ob.themeAuto;
   state.settings.themeIndex = ob.themeIndex;
   state.settings.pompesMatin = ob.pompesMatin;
