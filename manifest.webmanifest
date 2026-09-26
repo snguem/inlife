@@ -1,0 +1,24 @@
+{
+  "id": "./inlife.html",
+  "name": "Inlife — Système 90 jours",
+  "short_name": "Inlife",
+  "description": "Programme de développement personnel : journée, thèmes, projets et finances. Fonctionne hors ligne.",
+  "lang": "fr",
+  "start_url": "./inlife.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#5B4BFF",
+  "theme_color": "#5B4BFF",
+  "categories": ["productivity", "lifestyle", "finance"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Aujourd'hui", "url": "./inlife.html?screen=today", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Finances", "url": "./inlife.html?screen=finance", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Calendrier", "url": "./inlife.html?screen=planning", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
