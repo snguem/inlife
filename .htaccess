@@ -1,0 +1,18 @@
+# Inlife — réglages pour les hébergements Apache (Hostinger, OVH, o2switch…)
+
+# Type correct du manifeste d'installation
+AddType application/manifest+json .webmanifest
+
+# Forcer le HTTPS (indispensable pour installer l'app)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# Toujours récupérer la dernière version de l'app et du service worker
+<IfModule mod_headers.c>
+  <FilesMatch "^(sw\.js|inlife\.html|index\.html)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
