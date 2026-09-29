@@ -765,6 +765,9 @@ button.theme-card { width: 100%; text-align: left; border: none; cursor: pointer
 .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
 .cat-opt { --k: var(--primary); display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px; border: 1.5px solid var(--line); border-radius: 14px; background: var(--surface); cursor: pointer; font: inherit; font-size: 12px; font-weight: 700; color: var(--ink-2); }
 .cat-opt.on { border-color: var(--k); background: color-mix(in srgb, var(--k) 12%, var(--surface)); color: var(--ink); }
+.color-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+.color-opt { --k: var(--primary); width: 32px; height: 32px; border-radius: 50%; background: var(--k); border: 2px solid transparent; cursor: pointer; padding: 0; }
+.color-opt.on { border-color: var(--ink); box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--k); }
 .sched-opts { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: end; }
 .sched-preview { background: var(--surface); border-radius: var(--r-md); padding: 4px 14px; margin-top: 12px; box-shadow: var(--shadow); }
 .sched-preview div { display: flex; justify-content: space-between; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 600; }
@@ -2685,6 +2688,11 @@ function renderSettings() {
         </select>
       </div>
       <div class="row">
+        <span class="icon-tile sm" style="--k:var(--k-growth)">${ic('layers')}</span>
+        <div class="row-main"><div class="row-title">Catégories</div><div class="row-sub">${state.finance.categories.expense.length} dépenses · ${state.finance.categories.income.length} entrées</div></div>
+        <button class="btn btn-sm btn-soft" onclick="openCategoryManager('expense', null)">Gérer</button>
+      </div>
+      <div class="row">
         <span class="icon-tile sm" style="--k:var(--amber)">${ic('bell')}</span>
         <div class="row-main"><div class="row-title">Rappels</div><div class="row-sub">Jours avant une échéance</div></div>
         <div class="stepper">
@@ -3395,7 +3403,9 @@ function skipOnboarding() {
 }
 
 // ===================== FINANCES =====================
-const FIN_CATS = {
+// Catégories par défaut : copiées dans state.finance.categories au premier lancement,
+// puis modifiables librement par l'utilisateur (ajout / renommage / suppression).
+const DEFAULT_FIN_CATS = {
   expense: [
     { id: 'food', label: 'Alimentation', icon: 'cart', color: 'var(--k-ritual)' },
     { id: 'transport', label: 'Transport', icon: 'car', color: 'var(--k-sport)' },
@@ -3406,6 +3416,7 @@ const FIN_CATS = {
     { id: 'shopping', label: 'Shopping', icon: 'bag', color: 'var(--k-growth)' },
     { id: 'education', label: 'Éducation', icon: 'book', color: 'var(--c-blue)' },
     { id: 'repay', label: 'Remboursement', icon: 'coins', color: 'var(--amber)' },
+    { id: 'loan', label: 'Prêt accordé', icon: 'coins', color: 'var(--amber)' },
     { id: 'other', label: 'Autre', icon: 'dot', color: 'var(--k-other)' },
   ],
   income: [
@@ -3413,12 +3424,22 @@ const FIN_CATS = {
     { id: 'business', label: 'Business', icon: 'chart', color: 'var(--k-work)' },
     { id: 'gift', label: 'Cadeau', icon: 'gift', color: 'var(--k-social)' },
     { id: 'repay', label: 'Remboursement', icon: 'coins', color: 'var(--amber)' },
+    { id: 'loan', label: 'Emprunt reçu', icon: 'coins', color: 'var(--amber)' },
     { id: 'other', label: 'Autre', icon: 'dot', color: 'var(--k-other)' },
   ],
 };
+function cloneFinCats() {
+  return { expense: DEFAULT_FIN_CATS.expense.map(c => ({ ...c })), income: DEFAULT_FIN_CATS.income.map(c => ({ ...c })) };
+}
+if (!state.finance.categories) { state.finance.categories = cloneFinCats(); saveState(); }
+const FIN_CAT_ICONS = ['cart', 'car', 'home', 'receipt', 'gamepad', 'heart', 'bag', 'book', 'coins', 'wallet', 'briefcase', 'chart', 'gift', 'sun', 'flame', 'target', 'trophy', 'dumbbell', 'flag', 'compass', 'layers', 'sparkles', 'folder', 'calendar', 'users', 'activity', 'sprout', 'monitor', 'dot'];
+const FIN_CAT_COLORS = ['var(--rose)', 'var(--amber)', 'var(--mint)', 'var(--primary)', 'var(--c-blue)', 'var(--c-teal)', 'var(--k-work)', 'var(--k-social)', 'var(--k-growth)', 'var(--k-sport)', 'var(--k-ritual)', 'var(--c-purple)', 'var(--c-coral)', 'var(--c-pink)', 'var(--k-other)'];
 const CURRENCIES = ['€', 'FCFA', '$', '£', 'CHF', 'MAD', 'DZD', 'TND', 'CAD'];
 
-function finCat(type, id) { const list = FIN_CATS[type]; return list.find(c => c.id === id) || list[list.length - 1]; }
+function finCat(type, id) {
+  const list = state.finance.categories[type];
+  return list.find(c => c.id === id) || list[list.length - 1] || { id: 'other', label: 'Autre', icon: 'dot', color: 'var(--k-other)' };
+}
 function sumOf(arr) { return arr.reduce((a, b) => a + b, 0); }
 function round2(n) { return Math.round(n * 100) / 100; }
 function money(n, signed) {
@@ -3723,11 +3744,14 @@ function openTxForm(id, type, keep) {
       <input id="tx-amount" type="number" inputmode="decimal" step="any" min="0" placeholder="0" aria-label="Montant" value="${escapeAttr(d.amount)}" oninput="txDraft.amount=this.value;this.classList.remove('invalid')">
       <span>${escapeHtml(state.finance.currency)}</span>
     </div>
-    <label>Catégorie</label>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <label style="margin:0">Catégorie</label>
+      <button type="button" class="btn btn-sm btn-soft" onclick="openCategoryManager('${d.type}', () => openTxForm(null,null,true))">${ic('edit')}Gérer</button>
+    </div>
     <div class="cat-grid">
-      ${FIN_CATS[d.type].map(c => `
+      ${state.finance.categories[d.type].map(c => `
         <button type="button" class="cat-opt ${d.category === c.id ? 'on' : ''}" style="--k:${c.color}" onclick="txPickCat(this,'${c.id}')">
-          <span class="icon-tile sm" style="--k:${c.color}">${ic(c.icon)}</span>${c.label}
+          <span class="icon-tile sm" style="--k:${c.color}">${ic(c.icon)}</span>${escapeHtml(c.label)}
         </button>`).join('')}
     </div>
     <label for="tx-label">Libellé (facultatif)</label>
@@ -3743,7 +3767,7 @@ function openTxForm(id, type, keep) {
 }
 function txSetType(t) {
   txDraft.type = t;
-  if (!FIN_CATS[t].some(c => c.id === txDraft.category)) txDraft.category = FIN_CATS[t][0].id;
+  if (!state.finance.categories[t].some(c => c.id === txDraft.category)) txDraft.category = state.finance.categories[t][0].id;
   openTxForm(null, null, true);
 }
 function txPickCat(el, id) {
@@ -3779,6 +3803,105 @@ function deleteTx(id) {
   });
 }
 
+// --- Gestion des catégories de transactions ---
+let catMgrType = 'expense';
+let catMgrOnClose = null;
+function openCategoryManager(type, onClose) {
+  const freshOpen = !document.getElementById('modal-overlay');
+  catMgrType = type || catMgrType || 'expense';
+  if (onClose !== undefined) catMgrOnClose = onClose;
+  renderCategoryManager(!freshOpen);
+}
+function closeCategoryManager() {
+  const cb = catMgrOnClose; catMgrOnClose = null;
+  closeModal();
+  if (cb) cb(); else render();
+}
+function renderCategoryManager(instant) {
+  const type = catMgrType;
+  const list = state.finance.categories[type];
+  openSheet(`
+    <div class="modal-title">Catégories</div>
+    <div class="tabs2" style="margin-top:16px">
+      <button class="${type === 'expense' ? 'on' : ''}" onclick="openCategoryManager('expense')">Dépenses</button>
+      <button class="${type === 'income' ? 'on' : ''}" onclick="openCategoryManager('income')">Entrées</button>
+    </div>
+    <div class="card" style="padding:6px 16px;margin-top:14px">
+      ${list.map(c => `
+        <div class="task-row">
+          <span class="icon-tile sm" style="--k:${c.color}">${ic(c.icon)}</span>
+          <span class="task-label">${escapeHtml(c.label)}</span>
+          <button class="icon-btn mini" onclick="openCategoryForm('${type}','${c.id}')" aria-label="Modifier">${ic('edit')}</button>
+          ${list.length > 1 ? `<button class="icon-btn mini" onclick="deleteCategory('${type}','${c.id}')" aria-label="Supprimer">${ic('trash')}</button>` : ''}
+        </div>`).join('')}
+    </div>
+    <button class="btn btn-dashed btn-block" style="margin-top:14px" onclick="openCategoryForm('${type}',null)">${ic('plus')}Ajouter une catégorie</button>
+    <div class="modal-actions"><button class="btn btn-ghost btn-block" onclick="closeCategoryManager()">Fermer</button></div>
+  `, { instant });
+}
+let catDraft = null;
+function openCategoryForm(type, id, keep) {
+  if (!keep) {
+    const c = id ? state.finance.categories[type].find(x => x.id === id) : null;
+    catDraft = c ? { type, id: c.id, label: c.label, icon: c.icon, color: c.color }
+      : { type, id: null, label: '', icon: FIN_CAT_ICONS[0], color: FIN_CAT_COLORS[state.finance.categories[type].length % FIN_CAT_COLORS.length] };
+  }
+  const d = catDraft;
+  const canDelete = d.id && state.finance.categories[type].length > 1;
+  openSheet(`
+    <div class="modal-title">${d.id ? 'Modifier la catégorie' : 'Nouvelle catégorie'}</div>
+    <label for="cat-label">Nom</label>
+    <input id="cat-label" value="${escapeAttr(d.label)}" placeholder="Ex : Cadeaux" oninput="catDraft.label=this.value;this.classList.remove('invalid')">
+    <label>Icône</label>
+    <div class="cat-grid">
+      ${FIN_CAT_ICONS.map(i => `
+        <button type="button" class="cat-opt ${d.icon === i ? 'on' : ''}" style="--k:${d.color}" onclick="catDraft.icon='${i}';openCategoryForm('${type}',${d.id ? `'${d.id}'` : null},true)">
+          <span class="icon-tile sm" style="--k:${d.color}">${ic(i)}</span>
+        </button>`).join('')}
+    </div>
+    <label>Couleur</label>
+    <div class="color-grid">
+      ${FIN_CAT_COLORS.map(k => `
+        <button type="button" class="color-opt ${d.color === k ? 'on' : ''}" style="--k:${k}" aria-label="Choisir cette couleur" onclick="catDraft.color='${k}';openCategoryForm('${type}',${d.id ? `'${d.id}'` : null},true)"></button>`).join('')}
+    </div>
+    <div class="modal-actions">
+      ${canDelete ? `<button class="btn btn-danger-outline btn-icon" onclick="deleteCategory('${type}','${d.id}')" aria-label="Supprimer">${ic('trash')}</button>` : `<button class="btn btn-ghost" onclick="openCategoryManager('${type}')">Annuler</button>`}
+      <button class="btn btn-primary" onclick="saveCategory()">Enregistrer</button>
+    </div>
+  `, { instant: keep });
+  if (!keep) setTimeout(() => document.getElementById('cat-label')?.focus(), 60);
+}
+function saveCategory() {
+  const d = catDraft;
+  const label = document.getElementById('cat-label').value.trim();
+  if (!label) { flagInvalid('cat-label'); return; }
+  const list = state.finance.categories[d.type];
+  if (d.id) {
+    Object.assign(list.find(x => x.id === d.id), { label, icon: d.icon, color: d.color });
+  } else {
+    list.push({ id: uid(), label, icon: d.icon, color: d.color });
+  }
+  saveState();
+  openCategoryManager(d.type);
+}
+function deleteCategory(type, id) {
+  const list = state.finance.categories[type];
+  if (list.length <= 1) return;
+  const c = list.find(x => x.id === id);
+  askConfirm({
+    title: 'Supprimer cette catégorie ?',
+    message: `${escapeHtml(c.label)}. Les mouvements existants seront reclassés dans une autre catégorie.`,
+    onCancel: () => openCategoryForm(type, id),
+    onConfirm: () => {
+      state.finance.categories[type] = list.filter(x => x.id !== id);
+      const fallback = state.finance.categories[type].find(x => x.id === 'other') || state.finance.categories[type][0];
+      state.finance.transactions.forEach(t => { if (t.type === type && t.category === id) t.category = fallback.id; });
+      saveState();
+      openCategoryManager(type);
+    }
+  });
+}
+
 // --- Prêt / emprunt ---
 let debtDraft = null;
 function openDebtForm(id, direction, keep) {
@@ -3790,7 +3913,7 @@ function openDebtForm(id, direction, keep) {
       ? { id: d.id, direction: d.direction, person: d.person, amount: String(d.amount), date: d.date, label: d.label || '',
           mode: d.schedule && d.schedule.length ? 'multi' : 'once', dueDate: d.dueDate || '',
           count: (d.schedule && d.schedule.length) || 3, freq: d.freq || 'month', first: (d.schedule && d.schedule[0] && d.schedule[0].date) || nextMonth }
-      : { id: null, direction: direction || 'lent', person: '', amount: '', date: today, label: '', mode: 'once', dueDate: '', count: 3, freq: 'month', first: nextMonth };
+      : { id: null, direction: direction || 'lent', person: '', amount: '', date: today, label: '', mode: 'once', dueDate: '', count: 3, freq: 'month', first: nextMonth, addToBudget: true };
   }
   const d = debtDraft;
   const lent = d.direction === 'lent';
@@ -3846,7 +3969,11 @@ function openDebtForm(id, direction, keep) {
       ${preview.length ? `<div class="sched-preview">${preview.map((it, i) => `<div><span>${i + 1}. ${fmtDate(it.date, { day: 'numeric', month: 'short', year: 'numeric' })}</span><b>${money(it.amount)}</b></div>`).join('')}</div>`
         : `<p class="muted-note">Indique le montant pour voir l'échéancier.</p>`}
     `}
-    ${d.id ? `<p class="muted-note">Les paiements déjà enregistrés sont conservés et imputés sur le nouvel échéancier.</p>` : ''}
+    ${d.id ? `<p class="muted-note">Les paiements déjà enregistrés sont conservés et imputés sur le nouvel échéancier.</p>` : `
+    <div class="row" style="padding:16px 0 0;border:none">
+      <div class="row-main"><div class="row-title">Ajouter au budget</div><div class="row-sub">Compter ${lent ? 'ce prêt' : 'cet emprunt'} comme ${lent ? 'une dépense' : 'une entrée'} du mois</div></div>
+      <button class="switch ${d.addToBudget ? 'on' : ''}" role="switch" aria-checked="${!!d.addToBudget}" aria-label="Ajouter au budget" onclick="debtDraft.addToBudget=!debtDraft.addToBudget;this.classList.toggle('on');this.setAttribute('aria-checked',this.classList.contains('on'))"></button>
+    </div>`}
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="${d.id ? `openDebtDetail('${d.id}')` : 'closeModal()'}">Annuler</button>
       <button class="btn btn-primary" onclick="saveDebt()">Enregistrer</button>
@@ -3868,6 +3995,12 @@ function saveDebt() {
     schedule: d.mode === 'multi' ? makeSchedule(amount, d.count, d.first || today, d.freq) : [],
   });
   if (debtRemaining(rec) > 0) delete rec.settledAt;
+  if (!existing && d.addToBudget) {
+    const lent = d.direction === 'lent';
+    const tx = { id: uid(), type: lent ? 'expense' : 'income', amount, category: 'loan', label: `${lent ? 'Prêt à' : 'Emprunt auprès de'} ${rec.person}`, date: rec.date, ts: Date.now(), debtId: rec.id };
+    state.finance.transactions.push(tx);
+    rec.txId = tx.id;
+  }
   if (!existing) state.finance.debts.push(rec);
   saveState();
   financeTab = 'debts';
@@ -3903,7 +4036,7 @@ function openDebtDetail(id, instant) {
       <span class="avatar lg" style="--k:${color}">${escapeHtml(initials(d.person))}</span>
       <div style="flex:1;min-width:0">
         <div class="modal-title">${escapeHtml(d.person)}</div>
-        <div class="modal-sub">${lent ? 'Prêt' : 'Emprunt'} de ${money(d.amount)} le ${fmtDate(d.date, { day: 'numeric', month: 'long' })}${d.label ? ' · ' + escapeHtml(d.label) : ''}</div>
+        <div class="modal-sub">${lent ? 'Prêt' : 'Emprunt'} de ${money(d.amount)} le ${fmtDate(d.date, { day: 'numeric', month: 'long' })}${d.label ? ' · ' + escapeHtml(d.label) : ''}${d.txId ? ' · Ajouté au budget' : ''}</div>
       </div>
       ${rem <= 0 ? '<span class="badge done">Soldé</span>' : ''}
     </div>
